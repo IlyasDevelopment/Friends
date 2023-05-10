@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}{{ user.username }}{% endblock %}
+
+{% block content %}
+  <h1>{{ user.username }}</h1>
+  {% with total_friends=user.friends.count %}
+    <span class="count">
+      <span class="total">{{ total_friends }}</span>
+      friend{{ total_friends|pluralize }}
+    </span>
+    {% if request.user != user %}
+      {% if request.user.id in users_with_request %}
+        <form class="friend-form" method="POST" action="{% url 'cancel_friend_request' username=user.username %}">
+          {% csrf_token %}
+          <button type="submit">Отменить запрос в друзья</button>
+        </form>
+        {% elif request.user not in user.friends.all %}
+        <form class="friend-form" method="POST" action="{% url 'send_friend_request' username=user.username %}">
+          {% csrf_token %}
+          <button type="submit">Добавить в друзья</button>
+        </form>
+      {% else %}
+        <form class="friend-form" method="POST" action="{% url 'delete_from_friends' username=user.username %}">
+          {% csrf_token %}
+          <button type="submit">Удалить из друзей</button>
+        </form>
+      {% endif %}
+    {% endif %}
+  {% endwith %}
+{% endblock %}

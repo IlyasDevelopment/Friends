@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}{% if section == "people" %}Люди{% else %}Мои друзья%}{% endif %}{% endblock %}
+
+{% block content %}
+  <h1>{% if section == "people" %}Люди{% else %}Мои друзья{% endif %}</h1>
+  <div id="people-list">
+    {% for user in users %}
+      <div class="user">
+        <div class="name-box">
+          <a href="{{ user.get_absolute_url }}" class="title">
+            {{ user.username }}
+          </a>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}

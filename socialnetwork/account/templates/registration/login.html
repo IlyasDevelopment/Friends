@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Авторизация{% endblock %}
+
+{% block content %}
+  {% if not request.user.is_authenticated %}
+    <h1>Авторизация</h1>
+    <p>Если у вас нет аккаунта, то вы можете <a href="{% url 'register' %}">зарегистрироваться</a>.</p>
+    <div class="login-form">
+      <form action="{% url 'login' %}" method="post">
+          {{ form.as_p }}
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ next }}" />
+          <input type="submit" value="Войти">
+      </form>
+    </div>
+  {% else %}
+    {% url 'dashboard' as dashboard %}
+    <meta http-equiv="refresh" content="0; URL={{ dashboard }}">
+  {% endif %}
+{% endblock %}

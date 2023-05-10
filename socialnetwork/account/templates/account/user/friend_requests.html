@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}{{ section }}{% endblock %}
+
+{% block content %}
+  <div id="people-list">
+    <h1>Полученные запросы</h1>
+    {% for request in received_requests %}
+      <div class="user">
+        <div class="name-box">
+          <a href="{{ request.from_user.get_absolute_url }}" class="title">
+            {{ request.from_user.username }}
+          </a>
+          <form class="friend-form" method="POST" action="{% url 'accept_friend_request' from_user=request.from_user %}">
+            {% csrf_token %}
+            <button type="submit">Принять запрос</button>
+          </form>
+          <form class="friend-form" method="POST" action="{% url 'decline_friend_request' from_user=request.from_user %}">
+            {% csrf_token %}
+            <button type="submit">Отклонить запрос</button>
+          </form>
+        </div>
+      </div>
+    {% endfor %}
+    <div style="clear:both;"></div>
+    <h1>Исходящие запросы</h1>
+    {% for request in sent_requests %}
+      <div class="user">
+        <div class="name-box">
+          <a href="{{ request.to_user.get_absolute_url }}" class="title">
+            {{ request.to_user.username }}
+          </a>
+          <form class="friend-form" method="POST" action="{% url 'cancel_friend_request' username=request.to_user.username %}">
+            {% csrf_token %}
+            <button type="submit">Отменить запрос в друзья</button>
+          </form>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}
