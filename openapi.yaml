@@ -1,0 +1,281 @@
+openapi: "3.0.0"
+info:
+  title: Friends API
+  version: "1.0.0"
+paths:
+  /account/register:
+    get:
+      summary: Display the login page
+      operationId: showRegisterPage
+      tags:
+        - Registration and Authorization
+      responses:
+        '200':
+          description: Returns the HTML for the register page
+    post:
+      summary: Register a new user
+      operationId: registerUser
+      tags:
+        - Registration and Authorization
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+                password1:
+                  type: string
+                password2:
+                  type: string
+      responses:
+        '302':
+          description: Redirects to the dashboard page after successful registration
+  /account/login:
+    get:
+      summary: Display the login page
+      operationId: showLoginPage
+      tags:
+        - Registration and Authorization
+      responses:
+        '200':
+          description: Returns the HTML for the login page
+    post:
+      summary: Log in a user
+      operationId: loginUser
+      tags:
+        - Registration and Authorization
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '302':
+          description: Redirects to the dashboard page after successful login
+  /account/logout:
+    get:
+      summary: Log out the currently logged-in user
+      operationId: logoutUser
+      tags:
+        - Registration and Authorization
+      responses:
+        '302':
+          description: Redirects to the login page after successful logout
+  /account/users/:
+    get:
+      summary: Get list of all active users.
+      tags:
+        - Users
+      responses:
+        "200":
+          description: List of active users.
+          content:
+            text/html:
+              schema:
+                type: object
+                properties:
+                  section:
+                    type: string
+                    example: people
+                  users:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+  /account/users/{username}/:
+    get:
+      summary: Get details for a specific user.
+      tags:
+        - Users
+      parameters:
+        - in: path
+          name: username
+          description: The username of the user to retrieve.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User details.
+          content:
+            text/html:
+              schema:
+                type: object
+                properties:
+                  section:
+                    type: string
+                    example: people
+                  users_with_request:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+  /account/requests/:
+    get:
+      summary: Get friend requests
+      description: Returns a list of friend requests received by the authenticated user.
+      tags:
+        - Friend Requests
+      responses:
+        '200':
+          description: List of friend requests successfully retrieved.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sent_requests:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FriendRequest'
+                  received_requests:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FriendRequest'
+  /account/requests/send-friend-request/{username}/:
+    post:
+      summary: Send friend request to a user.
+      tags:
+        - Friend Requests
+      parameters:
+        - in: path
+          name: username
+          description: The username of the user to send friend request to.
+          required: true
+          schema:
+            type: string
+      responses:
+        "302":
+          description: Friend request sent successfully and user is redirected to the previous page.
+  /account/requests/cancel-friend-request/{username}/:
+    post:
+      summary: Cancel friend request
+      description: Cancel a friend request sent to a user.
+      tags:
+        - Friend Requests
+      parameters:
+        - in: path
+          name: username
+          required: true
+          description: Username of the recipient user.
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Friend request cancelled successfully and user is redirected to the previous page.
+  /account/requests/accept-friend-request/{from_user}/:
+    post:
+      summary: Accept friend request
+      description: Accept a friend request from a user.
+      tags:
+        - Friend Requests
+      parameters:
+        - in: path
+          name: from_user
+          required: true
+          description: Username of the user who sent the friend request.
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Friend request accepted successfully and user is redirected to the previous page.
+  /account/requests/decline-friend-request/{from_user}/:
+    post:
+      summary: Decline friend request
+      description: Decline a friend request from a user.
+      tags:
+        - Friend Requests
+      parameters:
+        - in: path
+          name: from_user
+          required: true
+          description: Username of the user who sent the friend request.
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Request declined successfully and user is redirected to the previous page.
+  /account/users/{username}/delete-from-friends/:
+    post:
+      summary: Delete a friend
+      description: Deletes a friend from the authenticated user's friend list.
+      tags:
+        - Users
+      parameters:
+        - name: username
+          in: path
+          required: true
+          description: Username of the friend to delete
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Friend deleted successfully and user is redirected to the previous page.
+  /account/friends/:
+    get:
+      summary: Get friend list
+      description: Returns a list of friends of the authenticated user.
+      tags:
+        - Users
+      responses:
+        '200':
+          description: List of friends successfully retrieved.
+          content:
+            text/html:
+              schema:
+                type: object
+                properties:
+                  section:
+                    type: string
+                    example: people
+                  users:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
+        is_active:
+          type: boolean
+      required:
+        - id
+        - username
+        - password
+        - is_active
+    FriendRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+        from_user:
+          $ref: '#/components/schemas/User'
+        to_user:
+          $ref: '#/components/schemas/User'
+      required:
+        - id
+        - from_user
+        - to_user
+  
